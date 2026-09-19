@@ -1,0 +1,52 @@
+A language model is a machine that assigns probabilities to text. Nothing more mystical
+than that. Given some text so far, it produces a distribution over what could come next.
+Every capability you associate with large models is built on top of that single trick.
+
+The trick works because language is redundant. After the letters "probabil", almost nothing
+but "i" can follow. After "the capital of France is", one answer dominates. A model that
+has read enough text learns these regularities as numbers, and those numbers are the model.
+
+Training and inference are different activities on the same object. During training, the
+text is already known. The model reads a passage, predicts the next token at every position
+at once, compares each prediction against the token that actually appeared, and nudges its
+numbers toward the truth. Nothing is generated. The answer key is the corpus itself, which
+is why this kind of learning needs no labels and can consume the open internet.
+
+During inference the answer key is gone. The model sees a prompt, produces one distribution,
+one token is chosen from it, and that token is appended to the text. Then the whole enlarged
+text is fed back in and the process repeats. This loop is what autoregressive generation
+means: the output of each step becomes part of the input to the next step. A model that
+writes a thousand words has run a thousand times, each time predicting only one token.
+
+Two consequences follow from the loop. First, generation is sequential and therefore slow in
+a way training is not, because step ten cannot begin until step nine has chosen. Second,
+mistakes compound, since a bad token stays in the context forever and every later prediction
+is conditioned on it. Much of the engineering around these systems exists to manage those
+two facts.
+
+Context is whatever text the model can see when it makes a prediction. It is finite. The
+model has no memory outside it, no notebook, no sense of yesterday. A conversation feels
+continuous only because the entire transcript is resent on every turn, which is why long
+chats cost more and why a fact that scrolls out of the window is simply gone.
+
+The choice of what to do with a distribution is yours, not the model's. Always taking the
+single most likely token is called greedy decoding, and it makes text that is correct and
+lifeless and prone to loops. Sampling from the distribution restores variety at the cost of
+reliability. Temperature scales the sharpness of the distribution before sampling: low
+temperature concentrates probability on the leaders, high temperature flattens it and lets
+unlikely tokens through. A model is a fixed function; the sampler is a dial you hold.
+
+None of this requires a neural network. A counting model over the last few characters is
+already a language model in the full sense, with a distribution, a generation loop, and a
+loss you can measure. It fails not because the idea is wrong but because counting cannot
+generalize: a context it has never seen tells it nothing, and the number of possible
+contexts grows faster than any corpus. The transformer is an answer to that failure, not a
+replacement for the framework.
+
+Evaluation of a raw language model is refreshingly concrete. Show it text it has never seen,
+ask how much probability it assigned to the tokens that actually appeared, and average the
+surprise. That average is cross-entropy loss, and its exponential is perplexity, which can
+be read as the effective number of choices the model felt it had at each position. A
+perplexity of two means the model was about as confused as someone flipping a coin. Lower is
+better, and the whole history of scaling is a history of driving this one number down on text
+the model was never trained on.
