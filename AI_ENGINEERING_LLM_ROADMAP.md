@@ -6,7 +6,30 @@ Progress from existing Python/ML/PyTorch knowledge to practical AI Engineering, 
 
 ---
 
+## API Access & Cost
+
+Most of this roadmap runs on your own machine with no paid API. Here is where that changes.
+
+| Phases | API key needed? | What you use |
+|---|---|---|
+| **1–3** — Foundations, Tiny LLM, Modern LLMs | **No** | PyTorch, Hugging Face, local models. Zero API spend. |
+| **4–10** — Applications, RAG, Tools, Agents, Eval, Safety | **Yes** | Anthropic API key (`ANTHROPIC_API_KEY`) from console.anthropic.com |
+| **11** — Local & Open-Source LLMs | **No** | Ollama / llama.cpp / vLLM on local hardware |
+| **12–17** — Infra, Model Engineering, Reasoning, AGI, Multimodal, Capstone | **Mixed** | Local for training/optimization work; API key for hosted-model work |
+
+### Claude Code subscription vs API key
+
+They are separate products with separate billing:
+
+- A **Claude Pro/Max subscription** covers claude.ai and the Claude Code CLI. It does **not** provide an API key, and the `anthropic` SDK cannot authenticate against it.
+- The **Claude Agent SDK** (`claude-agent-sdk` / `@anthropic-ai/claude-agent-sdk`) is Claude Code packaged as a library and *does* run on the subscription login — no key required. But it is an agent loop with built-in tools, not a raw completions call: no control over `temperature`, sampling, or single-turn request shape, and it shares the subscription's rate limits. Fine for prototyping in Phases 6–8; wrong tool for Phase 9 eval runs.
+- For anything to be **measured** — token counting, controlled sampling, batch runs, evals — use a real API key. A small credit balance goes a long way; Haiku 4.5 is $1/$5 per million input/output tokens.
+
+Docs: `code.claude.com/docs/en/agent-sdk`
+
 # Phase 1 — LLM Foundations
+
+_No API key required — everything here runs locally._
 
 ## 1. Language Modeling
 - What is a language model
@@ -54,6 +77,8 @@ Progress from existing Python/ML/PyTorch knowledge to practical AI Engineering, 
 
 # Phase 2 — Build a Tiny LLM
 
+_No API key required — everything here runs locally._
+
 ## 6. Tokenizer From Scratch
 - Vocabulary
 - Token-to-ID mapping
@@ -93,6 +118,8 @@ Progress from existing Python/ML/PyTorch knowledge to practical AI Engineering, 
 ---
 
 # Phase 3 — Modern LLMs
+
+_No API key required — Hugging Face models run locally._
 
 ## 11. Transformer Deep Dive
 - Transformer evolution
@@ -135,6 +162,8 @@ Progress from existing Python/ML/PyTorch knowledge to practical AI Engineering, 
 ---
 
 # Phase 4 — LLM Application Engineering
+
+_API key required from here on. See [API Access & Cost](#api-access--cost)._
 
 ## 16. LLM APIs
 - API requests
@@ -380,6 +409,8 @@ Progress from existing Python/ML/PyTorch knowledge to practical AI Engineering, 
 ---
 
 # Phase 11 — Local & Open-Source LLMs
+
+_No API key required — local inference only._
 
 ## 44. Open-Source Models
 - Llama
