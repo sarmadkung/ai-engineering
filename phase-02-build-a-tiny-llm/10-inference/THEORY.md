@@ -101,10 +101,11 @@ Report these, because every serving decision in later phases refers to them:
 - **latency** — total time to finish a response
 - **time to first token (TTFT)** — how responsive it feels
 - **tokens per second** — throughput
-- **prefill vs decode** — prefill processes the whole prompt in parallel (fast per token);
-  decode produces one token at a time (slow per token). Long prompts are cheap; long
-  *outputs* are expensive. This asymmetry drives API pricing, where input tokens cost less
-  than output tokens.
+- **prefill vs decode** — prefill processes the whole prompt in parallel (fast *per token*);
+  decode produces one token at a time (slow *per token*). So input tokens are cheap per
+  token, not cheap in total — a 100k-token prompt is still expensive. This asymmetry is the
+  main reason providers price input tokens below output tokens, though the price itself is a
+  business decision, not a law of the architecture.
 
 ---
 

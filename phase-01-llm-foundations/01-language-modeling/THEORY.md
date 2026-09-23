@@ -141,7 +141,10 @@ Now the correct answer is *not* known. It just predicts.
 
 **The most useful thing to take from this table:** when you chat with an AI, it is
 **not learning** from you. The model is frozen. It only looks smart about your earlier
-messages because the app sends the whole conversation again every single time.
+messages because that earlier text is placed in front of it again on every turn. *How* the
+system does that — resending the messages, keeping them on the server, sending a summary —
+is an implementation detail. Either way, the model itself starts from nothing but what it
+is shown.
 
 ---
 
@@ -156,10 +159,37 @@ The context has a **maximum size** (a "context window"). In the model you build,
 window will be tiny — maybe 4 characters. A real LLM's window is huge, but the rule is
 the same: there is a limit, and past the limit, text is gone.
 
+**Careful: "the model" is not "the AI app."** Keep these apart from now on, because almost
+every later phase lives in the outer box, not the inner one:
+
+```
+                    AI APPLICATION
+  ┌────────────────────────────────────────────────┐
+  │  conversation state · memory · retrieval       │
+  │  tools · agent loop · prompt assembly          │
+  │                                                │
+  │  all of it exists to decide ONE thing:         │
+  │  what text goes into the box below             │
+  │                     │                          │
+  │                     ▼                          │
+  │            ┌──────────────────┐                │
+  │            │      MODEL       │                │
+  │            │  frozen weights  │                │
+  │            │  + this context  │                │
+  │            └──────────────────┘                │
+  └────────────────────────────────────────────────┘
+```
+
+An application can have databases, notes about you, and years of history. **The model has
+weights plus whatever text is in front of it right now** — nothing else. When people say
+"the AI remembers me," they mean the application put something in the context. Everything
+in Phases 4, 5, 7 and 14 is work in the outer box.
+
 Three real-world consequences:
 
-- Chat apps resend the *entire* conversation on every message. That is the only way the
-  AI "remembers" earlier turns.
+- Every turn, earlier messages have to be put back into the context somehow — resent,
+  held server-side, summarized, or retrieved. Systems differ in the mechanism; none of them
+  escape the rule, because the model has no other way to see them.
 - Long conversations cost more money, because you are sending more text each time.
 - When a chat gets very long, early parts fall out of the window and are simply gone.
 

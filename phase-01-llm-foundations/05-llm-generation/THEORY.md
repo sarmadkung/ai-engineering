@@ -72,8 +72,8 @@ it is genuinely uncertain, k=50 may cut off good ones.
 
 **top-p (nucleus)** — sort by probability, keep adding tokens until their cumulative
 probability reaches p (e.g. 0.9), discard the rest, renormalize, sample. This **adapts**:
-a confident step keeps 1–2 tokens, an open-ended step keeps hundreds. This is why top-p is
-the common default.
+a confident step keeps 1–2 tokens, an open-ended step keeps hundreds. Defaults vary by
+provider and model, so judge it by the mechanism, not by what any API happens to ship with.
 
 **min-p** — keep tokens whose probability is at least some fraction of the top token's.
 Another adaptive variant you'll see in local-model tooling (Phase 11).
