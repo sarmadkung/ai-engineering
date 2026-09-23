@@ -190,7 +190,9 @@ Three real-world consequences:
 - Every turn, earlier messages have to be put back into the context somehow — resent,
   held server-side, summarized, or retrieved. Systems differ in the mechanism; none of them
   escape the rule, because the model has no other way to see them.
-- Long conversations cost more money, because you are sending more text each time.
+- Long conversations tend to cost more, because more text has to be processed each turn.
+  Providers soften this — **prompt caching** makes an unchanged prefix much cheaper to re-send
+  — but softer is not free, and the cost still grows with the conversation.
 - When a chat gets very long, early parts fall out of the window and are simply gone.
 
 Later in the roadmap, "context engineering" (Phase 4) and "RAG" (Phase 5) are both just
@@ -212,9 +214,12 @@ Say the model returns:
 Ways to pick:
 
 **Greedy** — always take the highest one (" Paris").
-Same input always gives same output. Problem: it gets stuck in loops. If the model comes
-back to text it has seen before, it must make the same choice again, so it repeats
-itself forever: *"is a prediction is a prediction is a prediction..."*
+Same input always gives same output. Problem: it gets stuck in loops. In the model you are
+about to build, this is a **guarantee**, not bad luck: its whole state is the last few tokens,
+so once it revisits a context it has been in, it must make the same choice, and the same one
+after that, forever — *"is a prediction is a prediction is a prediction..."* (Q10 asks you to
+prove this.) Big models loop too, but less strictly: their state is the entire context, so
+returning to the same few words does not force the same choice. It just makes it likely.
 
 **Sampling** — pick randomly, but respecting the percentages. " Paris" 60% of the time,
 " Lyon" 20% of the time. More variety, less predictable.
@@ -227,7 +232,8 @@ normal           (1.0)  ->  the numbers as they are
 high temperature (1.8)  ->  " Paris" 30%, " banana" 2%    = creative, then nonsense
 ```
 
-Temperature 0 is the same as greedy.
+Temperature 0 is treated as greedy. (Strictly it is a division by zero and undefined;
+"0 means greedy" is a convention every API follows. Topic 5 shows why.)
 
 **top-k** — throw away everything except the k best options, then pick.
 **top-p** — keep the best options until their total reaches p (say 90%), throw away the

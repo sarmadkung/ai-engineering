@@ -42,8 +42,12 @@ The gradient says which direction; the learning rate says how far.
 - **Too low** — loss drops painfully slowly, or stalls.
 - **Right** — smooth, steady decline.
 
-For a small transformer, start near `3e-4`. If loss is `NaN` within a few steps, your
-learning rate is almost certainly too high.
+For a small transformer, start near `3e-4`. If loss is `NaN` within a few steps, lower the
+learning rate first — it is the quickest thing to rule out. But you wrote this model
+yourself, so also check the usual from-scratch culprits: an unnormalized or corrupt batch, a
+wrong attention mask, a softmax without the max-subtraction trick (Topic 5, Q1), bad
+initialization, or a division by zero in your loss. A `NaN` means "something became infinite
+or undefined"; the learning rate is only the most common way to get there.
 
 **Schedules** — the rate should change over training:
 
@@ -76,10 +80,12 @@ Track **training loss** and **validation loss** together. That pair is the whole
 | both flat and high | not learning | check learning rate, shapes, data pipeline |
 | loss = `NaN` | numerical blow-up | lower learning rate, add gradient clipping |
 | loss spikes then recovers | bad batch or rate slightly high | watch; clip gradients |
-| validation lower than train | leakage or a bug | investigate immediately |
+| validation lower than train | usually **dropout** — it damages training but is off at eval; also check leakage or a bug | expect a small gap; investigate a large or growing one |
 
-The point where validation loss turns upward is the moment to stop. That's **early stopping**,
-and it's why you keep the checkpoint with the best *validation* loss rather than the last one.
+When validation loss *consistently* stops improving or starts climbing, it is time to stop.
+That's **early stopping**. Judge it over a window, not a single evaluation — validation curves
+are noisy, and one bad reading is not a trend. Either way, keep the checkpoint with the best
+*validation* loss rather than the last one.
 
 ## 9.6 Gradient clipping and accumulation
 

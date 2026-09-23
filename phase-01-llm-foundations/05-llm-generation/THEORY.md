@@ -78,8 +78,9 @@ provider and model, so judge it by the mechanism, not by what any API happens to
 **min-p** — keep tokens whose probability is at least some fraction of the top token's.
 Another adaptive variant you'll see in local-model tooling (Phase 11).
 
-Order of operations matters, and the standard order is: temperature → top-k → top-p →
-sample.
+Order of operations matters, and it is the order you will implement: temperature → top-k →
+top-p → sample. It is the most common arrangement, not a specification — libraries differ, so
+when you read someone else's decoder, check the order before assuming it matches yours.
 
 ## 5.6 Repetition controls
 

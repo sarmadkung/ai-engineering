@@ -18,6 +18,14 @@ Everything you built in Phases 1–2 happens on their servers: tokenizer, forwar
 sampling, detokenizing. Your Phase 1 knowledge is what makes the parameters legible instead
 of magic — `temperature` and `top_p` are exactly the knobs from Topic 5.
 
+**But check whether the model still exposes them.** On the current Claude frontier models
+(Opus 5, Sonnet 5, and the Fable family) `temperature`, `top_p` and `top_k` have been
+**removed — sending one returns a 400**. Reasoning depth is set with `effort` instead
+(§16.8). Claude Haiku 4.5 and older models still accept them. This is worth sitting with: the
+decoding knobs are not a law of the API, they are a surface a provider chooses to expose, and
+a frontier model can withdraw them. Knowing the pipeline underneath is what lets you read that
+change as a design decision rather than a mystery.
+
 **Use the official SDK rather than raw HTTP.** It handles retries, streaming assembly, and
 typed errors. For Claude that's the `anthropic` package (Python) or `@anthropic-ai/sdk`
 (TypeScript).
@@ -50,8 +58,10 @@ Claude models:
 | Claude Sonnet 5 | `claude-sonnet-5` | 1M | $2.00 | $10.00 |
 | Claude Haiku 4.5 | `claude-haiku-4-5` | 200K | $1.00 | $5.00 |
 
-(Check live pricing before quoting it; these move. Other providers have the same shape:
-a flagship, a mid tier, a cheap fast tier.)
+**This table is a snapshot, verified 2026-09-24.** Model IDs, context windows, prices and
+accepted parameters all change, and old model versions get retired. Check the provider's own
+docs before relying on any row of it. Other providers have the same shape: a flagship, a mid
+tier, a cheap fast tier.
 
 **Output costs ~5× input.** That's not arbitrary — it's the prefill/decode asymmetry you
 measured in Topic 10. Prompt tokens are processed in parallel; output tokens are generated
@@ -175,9 +185,13 @@ time for both versions.
 
 ### Q6. Parameters you already understand
 **Build:** the same prompt at temperature 0 and 1.0 (three times each), and with a low
-`max_tokens`.
+`max_tokens`. Use a model that still accepts sampling parameters — Claude Haiku 4.5 works and
+is the cheap tier anyway. Then send `temperature` to a frontier model (Opus 5 or Sonnet 5) as
+well, and read the error it returns.
 **Explain:** relate each observation to Topic 5. What does the low `max_tokens` output look
-like, and how would your application detect that case?
+like, and how would your application detect that case? Then: you just saw the same parameter
+accepted by one model and rejected by another in the same family. What does that tell you
+about where decoding settings actually live?
 
 ### Q7. Retry with backoff
 **Build:** a wrapper with exponential backoff and jitter that retries 429/5xx/timeout and

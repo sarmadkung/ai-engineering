@@ -25,6 +25,8 @@ They are separate products with separate billing:
 - The **Claude Agent SDK** (`claude-agent-sdk` / `@anthropic-ai/claude-agent-sdk`) is Claude Code packaged as a library and *does* run on the subscription login — no key required. But it is an agent loop with built-in tools, not a raw completions call: no control over `temperature`, sampling, or single-turn request shape, and it shares the subscription's rate limits. Fine for prototyping in Phases 6–8; wrong tool for Phase 9 eval runs.
 - For anything to be **measured** — token counting, controlled sampling, batch runs, evals — use a real API key. A small credit balance goes a long way; Haiku 4.5 is $1/$5 per million input/output tokens.
 
+> **Model names, prices, context windows and accepted parameters in this roadmap are a snapshot (verified 2026-09-24) and will drift.** Verify against the provider's current docs before you build against them. Two that already bite: current Claude frontier models reject `temperature`/`top_p`/`top_k` outright, and older model IDs get retired. Treat every provider-specific number here as an example of the *shape* of the decision, not as a fact with a long shelf life.
+
 Docs: `code.claude.com/docs/en/agent-sdk`
 
 # Phase 1 — LLM Foundations

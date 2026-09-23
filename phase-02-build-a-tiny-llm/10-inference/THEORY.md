@@ -63,8 +63,11 @@ representations of tokens 1–499, which haven't changed. Cost grows quadratical
 length for no reason.
 
 The fix — **KV caching** — stores each position's computed keys and values, so each new step
-only computes K and V for the one new token and attends against the stored rest. Generation
-becomes roughly linear in length instead of quadratic, typically a 10×+ speedup.
+only computes K and V for the one new token and attends against the stored rest. The dominant
+per-step cost stops growing with the text already generated, which turns the total from
+quadratic into roughly linear. How much faster that actually is depends on model size,
+sequence length, batch size and hardware, so measure it rather than quoting a figure — Q7
+makes you do exactly that.
 
 Details live in Phase 3 (Topic 12), but the idea belongs here because you feel the pain here.
 The memory cost is real: cache size grows with sequence length × layers × heads, and for long
