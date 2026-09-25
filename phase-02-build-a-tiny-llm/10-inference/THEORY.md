@@ -63,8 +63,11 @@ representations of tokens 1–499, which haven't changed. Cost grows quadratical
 length for no reason.
 
 The fix — **KV caching** — stores each position's computed keys and values, so each new step
-only computes K and V for the one new token and attends against the stored rest. Generation
-becomes roughly linear in length instead of quadratic, typically a 10×+ speedup.
+only computes K and V for the one new token and attends against the stored rest. The dominant
+per-step cost stops growing with the text already generated, which turns the total from
+quadratic into roughly linear. How much faster that actually is depends on model size,
+sequence length, batch size and hardware, so measure it rather than quoting a figure — Q7
+makes you do exactly that.
 
 Details live in Phase 3 (Topic 12), but the idea belongs here because you feel the pain here.
 The memory cost is real: cache size grows with sequence length × layers × heads, and for long
@@ -101,10 +104,11 @@ Report these, because every serving decision in later phases refers to them:
 - **latency** — total time to finish a response
 - **time to first token (TTFT)** — how responsive it feels
 - **tokens per second** — throughput
-- **prefill vs decode** — prefill processes the whole prompt in parallel (fast per token);
-  decode produces one token at a time (slow per token). Long prompts are cheap; long
-  *outputs* are expensive. This asymmetry drives API pricing, where input tokens cost less
-  than output tokens.
+- **prefill vs decode** — prefill processes the whole prompt in parallel (fast *per token*);
+  decode produces one token at a time (slow *per token*). So input tokens are cheap per
+  token, not cheap in total — a 100k-token prompt is still expensive. This asymmetry is the
+  main reason providers price input tokens below output tokens, though the price itself is a
+  business decision, not a law of the architecture.
 
 ---
 
